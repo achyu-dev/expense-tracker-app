@@ -4,7 +4,7 @@ import { Stack } from 'expo-router'
 
 const _layout = () => {
   return (
-    <Stack></Stack>
+    <Stack screenOptions={{headerShown: false}}></Stack>
   )
 }
 
