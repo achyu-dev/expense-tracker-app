@@ -14,18 +14,24 @@ import { ContactlessPayment } from "phosphor-react-native";
 import { colors, spacingX, spacingY } from "@/constants/theme";
 import { verticalScale } from "@/utils/styling";
 import { Shadow } from "react-native-shadow-2";
+import Button from "@/components/Button";
+import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
+import { useRouter } from "expo-router";
 
 const Welcome = () => {
+  const router = useRouter();
+
   return (
     <ScreenWrapper>
       <View style={styles.container}>
         {/* Login button and image */}
         <View>
-          <TouchableOpacity style={styles.loginButton}>
+          <TouchableOpacity style={styles.loginButton} onPress={() => router.push("/(auth)/login")}>
             <Typo fontWeight={"500"}>Sign In</Typo>
           </TouchableOpacity>
 
-          <Image
+          <Animated.Image
+            entering={FadeIn.duration(2000)}
             source={require("@/assets/images/welcome.png")}
             style={styles.welcomeImage}
             resizeMode="contain"
@@ -33,28 +39,32 @@ const Welcome = () => {
         </View>
 
         {/* Footer */}
-
         <View style={[styles.footer, styles.shadow]}>
-          <View style={{ alignItems: "center" }}>
+          <Animated.View entering={FadeInDown.duration(1000).springify().damping(12)} style={{ alignItems: "center" }}>
             <Typo size={30} fontWeight={"800"}>
               Always Take Control
             </Typo>
             <Typo size={30} fontWeight={"800"}>
               Of Your Money
             </Typo>
-          </View>
-          <View style={{alignItems: "center", gap: 2}}>
-          <Typo size={17} color={colors.textLight}>
+          </Animated.View>
+
+          <Animated.View entering={FadeInDown.duration(1000).delay(300).springify().damping(12)} style={{ alignItems: "center", gap: 2 }}>
+            <Typo size={17} color={colors.textLight}>
               Money for a better
             </Typo>
             <Typo size={17} color={colors.textLight}>
               lifestyle in the future
             </Typo>
-          </View>
+          </Animated.View>
 
-          <View style={styles.buttonContainer}></View>
-            {/* Button */}
-
+          <Animated.View entering={FadeInDown.duration(1000).delay(300).springify().damping(12)} style={styles.buttonContainer}>
+            <Button onPress={() => router.push("/(auth)/register" as any)}>
+              <Typo size={22} color={colors.neutral900} fontWeight={"600"}>
+                Get Started
+              </Typo>
+            </Button>
+          </Animated.View>
         </View>
       </View>
     </ScreenWrapper>
