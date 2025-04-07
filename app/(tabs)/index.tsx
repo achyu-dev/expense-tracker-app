@@ -5,18 +5,23 @@ import Typo from "@/components/Typo";
 import { colors } from "@/constants/theme";
 import { signOut } from "firebase/auth";
 import { auth } from "@/config/firebase";
+import { useAuth } from "@/contexts/authContext";
+import ScreenWrapper from "@/components/ScreenWrapper";
 
 const Home = () => {
+  const{user} = useAuth();
+  console.log("user:, ", user);
+  
   const handleLogOut = async () => {
     await signOut(auth);
   };
 
   return (
-    <View>
+    <ScreenWrapper>
       <Button onPress={handleLogOut}>
         <Typo color={colors.black}>Logout</Typo>
       </Button>
-    </View>
+    </ScreenWrapper>
   );
 };
 
