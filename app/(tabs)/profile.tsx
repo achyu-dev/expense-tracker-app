@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React from "react";
 import ScreenWrapper from "@/components/ScreenWrapper";
 import { colors, radius, spacingX, spacingY } from "@/constants/theme";
@@ -6,10 +6,69 @@ import { verticalScale } from "@/utils/styling";
 import Header from "@/components/Header";
 import { useAuth } from "@/contexts/authContext";
 import Typo from "@/components/Typo";
-import {Image} from "expo-image";
+import { Image } from "expo-image";
+import { getProfileImage } from "@/services/imageService";
+import { accountOptionType } from "@/types";
+import * as Icons from "phosphor-react-native";
+import Animated, { FadeInDown } from "react-native-reanimated";
+import { signOut } from "firebase/auth";
+import { auth } from "@/config/firebase";
 
 const Profile = () => {
-  const {user} = useAuth(); 
+  const { user } = useAuth();
+
+  const accountOptions: accountOptionType[] = [
+    {
+      title: "Edit Profile",
+      icon: <Icons.User size={26} color={colors.white} weight="fill" />,
+      routeName: "(modals)/profileModal",
+      bgColor: "#6366f1",
+    },
+    {
+      title: "Settings",
+      icon: <Icons.GearSix size={26} color={colors.white} weight="fill" />,
+      //routeName: "(modals)/profileModal",
+      bgColor: "#059669",
+    },
+    {
+      title: "Privacy Policy",
+      icon: <Icons.Lock size={26} color={colors.white} weight="fill" />,
+      //routeName: "(modals)/profileModal",
+      bgColor: colors.neutral600,
+    },
+    {
+      title: "Logout",
+      icon: <Icons.Power size={26} color={colors.white} weight="fill" />,
+      //routeName: "(modals)/profileModal",
+      bgColor: "#e11d48",
+    },
+  ];
+
+  const handleLogOut = async () => {
+    await signOut(auth);
+  };
+
+  const showLogoutalert = () => {
+    Alert.alert("Confirm", "Are you sure you want to logout?", [
+      {
+        text: "Cancel",
+        onPress: () => console.log("Cancel Pressed"),
+        style: "cancel",
+      },
+      {
+        text: "Logout",
+        onPress: () => handleLogOut(),
+        style: "destructive",
+      },
+    ]);
+  };
+
+  const handlePress = (item: accountOptionType) => {
+    if (item.title == "Logout") {
+      showLogoutalert();
+    }
+  };
+
   return (
     <ScreenWrapper>
       <View style={styles.container}>
@@ -20,18 +79,62 @@ const Profile = () => {
           {/* avatar*/}
           <View>
             {/* image */}
-
+            <Image
+              source={getProfileImage(user?.image)}
+              style={styles.avatar}
+              contentFit="cover"
+              transition={100}
+            />
           </View>
 
           {/* name and email*/}
           <View style={styles.nameContainer}>
-              <Typo size={24} fontWeight={"600"} color={colors.neutral100}>
-                {user?.name}
-              </Typo>
-              <Typo size={15} color={colors.neutral400}>
-                {user?.email}
-              </Typo>
+            <Typo size={24} fontWeight={"600"} color={colors.neutral100}>
+              {user?.name}
+            </Typo>
+            <Typo size={15} color={colors.neutral400}>
+              {user?.email}
+            </Typo>
           </View>
+        </View>
+
+        {/* Account Options */}
+        <View style={styles.accountOptions}>
+          {accountOptions.map((item, index) => {
+            return (
+              <Animated.View
+                key={index.toString()}
+                entering={FadeInDown.delay(index * 50)
+                  .springify()
+                  .damping(14)}
+                style={styles.listItem}
+              >
+                <TouchableOpacity
+                  style={styles.flexRow}
+                  onPress={() => handlePress(item)}
+                >
+                  <View
+                    style={[
+                      styles.listIcon,
+                      {
+                        backgroundColor: item?.bgColor,
+                      },
+                    ]}
+                  >
+                    {item.icon && item.icon}
+                  </View>
+                  <Typo size={16} style={{ flex: 1 }} fontWeight={"500"}>
+                    {item.title}
+                  </Typo>
+                  <Icons.CaretRight
+                    size={verticalScale(20)}
+                    color={colors.white}
+                    weight="bold"
+                  />
+                </TouchableOpacity>
+              </Animated.View>
+            );
+          })}
         </View>
       </View>
     </ScreenWrapper>
@@ -65,7 +168,7 @@ const styles = StyleSheet.create({
     borderRadius: 200,
   },
 
-  editIccon: {
+  editIcon: {
     position: "absolute",
     bottom: 5,
     right: 8,
@@ -109,5 +212,15 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: spacingX._10,
+  },
+
+  listIcon: {
+    height: verticalScale(44),
+    width: verticalScale(44),
+    backgroundColor: colors.neutral500,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: radius._15,
+    borderCurve: "continuous",
   },
 });
