@@ -48,3 +48,10 @@ export const getProfileImage = (file: any) => {
 
   return require("../assets/images/defaultAvatar.png");
 };
+
+export const getFilePath = (file: any) => {
+  if (file && file == "string") return file;
+  if (file && file == "object") return file.uri;
+
+  return null;
+};
