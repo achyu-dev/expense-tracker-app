@@ -22,10 +22,11 @@ import { UserDataType, WalletType } from "@/types";
 import Button from "@/components/Button";
 import { useAuth } from "@/contexts/authContext";
 import { updateUser } from "@/services/userService";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 import ImageUpload from "@/components/imageUpload";
-import { createOrUpdateWallet } from "@/services/walletService";
+import { createOrUpdateWallet, deleteWallet } from "@/services/walletService";
+
 
 const WalletModal = () => {
   const { user, updateUserData } = useAuth();
@@ -36,6 +37,19 @@ const WalletModal = () => {
 
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+
+  const oldWallet: { name: string; image: string; id: string } =
+    useLocalSearchParams();
+  console.log("oldWallet", oldWallet);
+
+  useEffect(() => {
+    if (oldWallet?.id) {
+      setwallet({
+        name: oldWallet?.name,
+        image: oldWallet?.image,
+      });
+    }
+  }, []);
 
   const onSubmit = async () => {
     let { name, image } = wallet;
@@ -49,7 +63,10 @@ const WalletModal = () => {
       image,
       uid: user?.uid,
     };
-    //todo : include wallet if updating
+    //include wallet if updating
+    if (oldWallet?.id) {
+      data.id = oldWallet?.id;
+    }
 
     setIsLoading(true);
     const res = await createOrUpdateWallet(data);
@@ -63,11 +80,46 @@ const WalletModal = () => {
     }
   };
 
+  const onDelete = async () => {
+    console.log("Delete wallet pressed", oldWallet?.id);
+    if (!oldWallet?.id) {
+      //Alert.alert("Error", "No wallet to delete");
+      return;
+    }
+    setIsLoading(true);
+    const res = await deleteWallet(oldWallet?.id);
+    setIsLoading(false);
+    if (res.success) {
+      router.back();
+    } else{
+      Alert.alert("Error", res.msg);
+    }
+  };
+
+  const showDeleteAlert = () => {
+    Alert.alert(
+      "Delete Wallet",
+      "Are you sure you want to delete this wallet? \n This action will delete all transactions related to this wallet.",
+      [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Cancel Delete"),
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          onPress: () => console.log("Delete pressed"),
+          style: "destructive",
+        },
+      ]
+    );
+  };
+
   return (
     <ModalWrapper>
       <View style={styles.container}>
         <Header
-          title="New Wallet"
+          title={oldWallet?.id ? "Updated Wallet" : "New Wallet"}
           leftIcon={<BackButton />}
           style={{ marginBottom: spacingY._10 }}
         />
@@ -93,12 +145,26 @@ const WalletModal = () => {
           </View>
         </ScrollView>
       </View>
-      <Text>WalletModal</Text>
 
       <View style={styles.footer}>
+        {oldWallet?.id && (
+          <Button
+            onPress={showDeleteAlert}
+            style={{
+              backgroundColor: colors.rose,
+              paddingHorizontal: spacingX._15,
+            }}
+          >
+            <Icons.Trash
+              weight="bold"
+              color={colors.white}
+              size={verticalScale(24)}
+            />
+          </Button>
+        )}
         <Button onPress={onSubmit} style={{ flex: 1 }} loading={isLoading}>
           <Typo color={colors.black} fontWeight={"700"}>
-            Add Wallet
+            {oldWallet?.id ? "Update Wallet" : "Add Wallet"}
           </Typo>
         </Button>
       </View>
