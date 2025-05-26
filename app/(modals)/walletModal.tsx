@@ -147,7 +147,7 @@ const WalletModal = () => {
       </View>
 
       <View style={styles.footer}>
-        {oldWallet?.id && (
+        {oldWallet?.id && !isLoading && (
           <Button
             onPress={showDeleteAlert}
             style={{
