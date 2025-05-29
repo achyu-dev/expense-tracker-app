@@ -23,8 +23,13 @@ const Wallet = () => {
     loading,
   } = useFetchdata<WalletType>("wallets", [
     where("uid", "==", user?.uid),
-    orderBy("createdAt", "desc"),
+    orderBy("created", "desc"),
   ]);
+
+  console.log("Fetching wallets for UID:", user?.uid);
+  console.log("Wallets:", wallets);
+  console.log("Error:", error);
+
 
   console.log("wallets", wallets.length);
 

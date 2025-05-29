@@ -6,6 +6,7 @@ import { firestore } from "@/config/firebase";
 export const createOrUpdateWallet = async (
   walletData: Partial<WalletType>
 ): Promise<ResponseType> => {
+  
   try {
     let walletTosave = { ...walletData };
 
@@ -22,13 +23,15 @@ export const createOrUpdateWallet = async (
       }
       walletTosave.image = imageUploadres.data;
     }
+    
+    console.log("Wallet data being saved:", walletTosave);
 
     if (!walletData?.id) {
       //new wallet
       walletTosave.amount = 0;
       walletTosave.totalIncome = 0;
       walletTosave.totalExpenses = 0;
-      walletTosave.created = new Date();
+      walletTosave.created = new Date();  
     }
 
     const walletRef = walletData?.id
