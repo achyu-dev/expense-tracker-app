@@ -2,17 +2,37 @@ import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 import Typo from "@/components/Typo";
 import { colors, spacingX, spacingY } from "@/constants/theme";
-import { scale } from "@/utils/styling";
+import { scale, verticalScale } from "@/utils/styling";
 import { ImageBackground } from "expo-image";
+import * as Icons from "phosphor-react-native";
 
 const HomeCard = () => {
   return (
     <ImageBackground
       source={require("@/assets/images/card.png")}
       style={styles.bgImage}
-      imageStyle={{ borderRadius: 20 }}
+      contentFit="fill"
     >
-      <Typo>Card</Typo>
+      <View style={styles.container}>
+        <View>
+          <View style={styles.totalBalanceRow}>
+            <Typo color={colors.neutral800} size={17} fontWeight={"500"}>
+              Total Balance
+            </Typo>
+            <Icons.DotsThreeOutline
+              size={verticalScale(23)}
+              color={colors.black}
+              weight="fill"
+            />
+          </View>
+          <Typo color={colors.black} size={32} fontWeight={"bold"}>
+             ₹ 68,765.00
+          </Typo>
+        </View>
+
+        {/* Income and Expenses */}
+        <View style={styles.stats}></View>
+      </View>
     </ImageBackground>
   );
 };
