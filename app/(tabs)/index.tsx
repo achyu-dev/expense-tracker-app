@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React from "react";
 import Button from "@/components/Button";
 import Typo from "@/components/Typo";
@@ -8,6 +8,9 @@ import { auth } from "@/config/firebase";
 import { useAuth } from "@/contexts/authContext";
 import ScreenWrapper from "@/components/ScreenWrapper";
 import { verticalScale } from "@/utils/styling";
+import * as Icons from "phosphor-react-native";
+import HomeCard from "@/components/HomeCard";
+
 
 const Home = () => {
   const { user } = useAuth();
@@ -17,6 +20,29 @@ const Home = () => {
       <View style={styles.container}>
         {/* Header */}
         {/*03:40:00 */}
+        <View style={styles.header}>
+          <View style={{ gap: 4 }}>
+            <Typo size={16} color={colors.neutral400}>
+              Hello,
+            </Typo>
+            <Typo size={20} fontWeight={"500"}>
+              {user?.name}
+            </Typo>
+          </View>
+
+          <TouchableOpacity style={styles.searchIcon}>
+            <Icons.MagnifyingGlass 
+            size={verticalScale(22)}
+            color={colors.neutral200}
+            weight="bold"
+            />
+          </TouchableOpacity>
+        </View>
+
+        <ScrollView contentContainerStyle={styles.scrollViewStyle} showsVerticalScrollIndicator={false}>
+          {/* Cards Section */}
+          <HomeCard />
+        </ScrollView>
       </View>
     </ScreenWrapper>
   );
