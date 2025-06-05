@@ -1,10 +1,11 @@
 import { StyleSheet, Text, View } from "react-native";
 import React from "react";
-import { TransactionListType } from "@/types";
+import { TransactionItemProps, TransactionListType } from "@/types";
 import { verticalScale } from "@/utils/styling";
 import { colors, radius, spacingX, spacingY } from "@/constants/theme";
 import Typo from "./Typo";
 import { FlashList } from "@shopify/flash-list";
+import Loading from "./Loading";
 
 const TransactionList = ({
   data,
@@ -12,6 +13,9 @@ const TransactionList = ({
   loading,
   emptyListMessage,
 }: TransactionListType) => {
+  const handleClick = () => {
+    // Handle the click event for the transaction item
+  };
   return (
     <View style={styles.container}>
       {title && (
@@ -22,18 +26,44 @@ const TransactionList = ({
 
       <View style={styles.list}>
         <FlashList
-          data={[1, 2, 4]}
+          data={data}
           renderItem={({ item, index }) => (
-            <TransactionItem item={item} index={index} />
+            <TransactionItem
+              item={item}
+              index={index}
+              handleClick={handleClick}
+            />
           )}
           estimatedItemSize={60}
         />
       </View>
+
+      {!loading && data.length == 0 && (
+        <Typo
+          size={14}
+          color={colors.neutral400}
+          style={{ textAlign: "center", marginTop: spacingY._15 }}
+        >
+          {emptyListMessage}
+        </Typo>
+      )}
+
+      {
+        loading && (
+            <View style={{ top: verticalScale(100)}}>
+                <Loading />
+            </View>
+        )
+      }
     </View>
   );
 };
 
-const TransactionItem = () => {
+const TransactionItem = ({
+  item,
+  index,
+  handleClick,
+}: TransactionItemProps) => {
   return (
     <View style={styles.row}>
       <Typo>Transaction Item</Typo>

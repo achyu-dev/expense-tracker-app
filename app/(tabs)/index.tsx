@@ -1,4 +1,10 @@
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import React from "react";
 import Button from "@/components/Button";
 import Typo from "@/components/Typo";
@@ -12,7 +18,6 @@ import * as Icons from "phosphor-react-native";
 import HomeCard from "@/components/HomeCard";
 import TransactionList from "@/components/TransactionList";
 
-
 const Home = () => {
   const { user } = useAuth();
 
@@ -20,7 +25,6 @@ const Home = () => {
     <ScreenWrapper>
       <View style={styles.container}>
         {/* Header */}
-        {/*03:40:00 */}
         <View style={styles.header}>
           <View style={{ gap: 4 }}>
             <Typo size={16} color={colors.neutral400}>
@@ -32,22 +36,30 @@ const Home = () => {
           </View>
 
           <TouchableOpacity style={styles.searchIcon}>
-            <Icons.MagnifyingGlass 
-            size={verticalScale(22)}
-            color={colors.neutral200}
-            weight="bold"
+            <Icons.MagnifyingGlass
+              size={verticalScale(22)}
+              color={colors.neutral200}
+              weight="bold"
             />
           </TouchableOpacity>
         </View>
 
-        <ScrollView contentContainerStyle={styles.scrollViewStyle} showsVerticalScrollIndicator={false}>
+        <ScrollView
+          contentContainerStyle={styles.scrollViewStyle}
+          showsVerticalScrollIndicator={false}
+        >
           {/* Cards Section */}
           <View>
-          <HomeCard />
+            <HomeCard />
           </View>
 
           {/* Transactions */}
-          <TransactionList title="Recent Transactions" />
+          <TransactionList
+            title="Recent Transactions"
+            data={[]}
+            loading={false}
+            emptyListMessage="No Transactions added yet"
+          />
         </ScrollView>
       </View>
     </ScreenWrapper>
