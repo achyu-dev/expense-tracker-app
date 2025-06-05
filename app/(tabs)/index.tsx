@@ -10,6 +10,7 @@ import ScreenWrapper from "@/components/ScreenWrapper";
 import { verticalScale } from "@/utils/styling";
 import * as Icons from "phosphor-react-native";
 import HomeCard from "@/components/HomeCard";
+import TransactionList from "@/components/TransactionList";
 
 
 const Home = () => {
@@ -41,7 +42,12 @@ const Home = () => {
 
         <ScrollView contentContainerStyle={styles.scrollViewStyle} showsVerticalScrollIndicator={false}>
           {/* Cards Section */}
+          <View>
           <HomeCard />
+          </View>
+
+          {/* Transactions */}
+          <TransactionList title="Recent Transactions" />
         </ScrollView>
       </View>
     </ScreenWrapper>

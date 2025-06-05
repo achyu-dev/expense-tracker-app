@@ -13,6 +13,7 @@ import { useAuth } from "@/contexts/authContext";
 import Loading from "@/components/Loading";
 import WalletListItem from "@/components/WalletListItem";
 
+
 const Wallet = () => {
   const router = useRouter();
   const { user } = useAuth();

@@ -26,12 +26,55 @@ const HomeCard = () => {
             />
           </View>
           <Typo color={colors.black} size={32} fontWeight={"bold"}>
-             ₹ 68,765.00
+            ₹ 68,765.00
           </Typo>
         </View>
 
         {/* Income and Expenses */}
-        <View style={styles.stats}></View>
+        <View style={styles.stats}>
+          {/* Income */}
+          <View style={{ gap: verticalScale(5) }}>
+            <View style={styles.incomeExpenses}>
+              <View style={styles.statsIcon}>
+                <Icons.ArrowDown
+                  size={verticalScale(15)}
+                  color={colors.black}
+                  weight="bold"
+                />
+              </View>
+              <Typo size={16} color={colors.neutral700} fontWeight={"500"}>
+                Income
+              </Typo>
+            </View>
+            <View style={{ alignSelf: "center" }}>
+              <Typo size={17} color={colors.green} fontWeight={"600"}>
+                ₹ 2334
+              </Typo>
+            </View>
+          </View>
+
+          {/* Expenses */}
+           <View style={{ gap: verticalScale(5) }}>
+            <View style={styles.incomeExpenses}>
+              <View style={styles.statsIcon}>
+                <Icons.ArrowUp
+                  size={verticalScale(15)}
+                  color={colors.black}
+                  weight="bold"
+                />
+              </View>
+              <Typo size={16} color={colors.neutral700} fontWeight={"500"}>
+                Expense
+              </Typo>
+            </View>
+            <View style={{ alignSelf: "center" }}>
+              <Typo size={17} color={colors.rose} fontWeight={"600"}>
+                ₹ 23344
+              </Typo>
+            </View>
+          </View>
+
+        </View>
       </View>
     </ImageBackground>
   );
