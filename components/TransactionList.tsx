@@ -1,4 +1,5 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import React from "react";
 import { TransactionItemProps, TransactionListType } from "@/types";
 import { verticalScale } from "@/utils/styling";
@@ -6,6 +7,7 @@ import { colors, radius, spacingX, spacingY } from "@/constants/theme";
 import Typo from "./Typo";
 import { FlashList } from "@shopify/flash-list";
 import Loading from "./Loading";
+import { expenseCategories } from "@/constants/data";
 
 const TransactionList = ({
   data,
@@ -48,13 +50,11 @@ const TransactionList = ({
         </Typo>
       )}
 
-      {
-        loading && (
-            <View style={{ top: verticalScale(100)}}>
-                <Loading />
-            </View>
-        )
-      }
+      {loading && (
+        <View style={{ top: verticalScale(100) }}>
+          <Loading />
+        </View>
+      )}
     </View>
   );
 };
@@ -64,10 +64,57 @@ const TransactionItem = ({
   index,
   handleClick,
 }: TransactionItemProps) => {
+  let category = expenseCategories[item.category || "entertainment"];
+  console.log("category", category);
+
+  if (!category) {
+    category = expenseCategories["food"] || {
+      label: "Other",
+      value: "other",
+      icon: () => null,
+      bgColor: "#666666",
+    };
+  }
+
+  const IconComponent = category?.icon;
   return (
-    <View style={styles.row}>
-      <Typo>Transaction Item</Typo>
-    </View>
+    <Animated.View
+      entering={FadeInDown.delay(index * 100)
+        .springify()
+        .damping(14)}
+    >
+      <TouchableOpacity style={styles.row} onPress={() => handleClick(item)}>
+        <View style={[styles.icon, { backgroundColor: category.bgColor }]}>
+          {IconComponent && (
+            <IconComponent
+              size={verticalScale(25)}
+              weight="fill"
+              color={colors.white}
+            />
+          )}
+        </View>
+
+        <View style={styles.categoryDes}>
+          <Typo size={17}>{category.label}</Typo>
+          <Typo
+            size={12}
+            color={colors.neutral400}
+            textProps={{ numberOfLines: 1 }}
+          >
+            {item?.description}
+          </Typo>
+        </View>
+
+        <View style={styles.amountDate}>
+          <Typo color={colors.rose} fontWeight={"500"}>
+            - ₹23
+          </Typo>
+          <Typo size={13} color={colors.neutral400}>
+            12 July 2025
+          </Typo>
+        </View>
+      </TouchableOpacity>
+    </Animated.View>
   );
 };
 

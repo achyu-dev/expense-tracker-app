@@ -56,11 +56,29 @@ const Home = () => {
           {/* Transactions */}
           <TransactionList
             title="Recent Transactions"
-            data={[]}
+            data={[
+              {
+                id: "1",
+                type: "expense",
+                amount: 100,
+                category: "food",
+                date: new Date(),
+                description: "Lunch",
+                walletId: "wallet1",
+              },
+            ]}
             loading={false}
             emptyListMessage="No Transactions added yet"
           />
         </ScrollView>
+
+        <Button style={styles.floatingButton}>
+          <Icons.Plus
+            color={colors.black}
+            weight="bold"
+            size={verticalScale(24)}
+          />
+        </Button>
       </View>
     </ScreenWrapper>
   );
