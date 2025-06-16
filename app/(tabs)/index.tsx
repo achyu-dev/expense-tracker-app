@@ -17,10 +17,11 @@ import { verticalScale } from "@/utils/styling";
 import * as Icons from "phosphor-react-native";
 import HomeCard from "@/components/HomeCard";
 import TransactionList from "@/components/TransactionList";
+import { router, useRouter } from "expo-router";
 
 const Home = () => {
   const { user } = useAuth();
-
+  const router = useRouter();
   return (
     <ScreenWrapper>
       <View style={styles.container}>
@@ -72,7 +73,10 @@ const Home = () => {
           />
         </ScrollView>
 
-        <Button style={styles.floatingButton}>
+        <Button
+          style={styles.floatingButton}
+          onPress={() => router.push("/(modals)/transactionModal" as any)}
+        >
           <Icons.Plus
             color={colors.black}
             weight="bold"
