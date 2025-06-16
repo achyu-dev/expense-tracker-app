@@ -1,4 +1,10 @@
-import { FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  FlatList,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import React from "react";
 import ScreenWrapper from "@/components/ScreenWrapper";
 import { colors, radius, spacingX, spacingY } from "@/constants/theme";
@@ -13,11 +19,10 @@ import { useAuth } from "@/contexts/authContext";
 import Loading from "@/components/Loading";
 import WalletListItem from "@/components/WalletListItem";
 
-
 const Wallet = () => {
   const router = useRouter();
   const { user } = useAuth();
-  
+
   const {
     data: wallets,
     error,
@@ -31,14 +36,13 @@ const Wallet = () => {
   console.log("Wallets:", wallets);
   console.log("Error:", error);
 
-
   console.log("wallets", wallets.length);
 
-  const getTotalBalance = () => 
+  const getTotalBalance = () =>
     wallets.reduce((total, items) => {
       total = total + (items?.amount || 0);
       return total;
-    },0)
+    }, 0);
 
   return (
     <ScreenWrapper style={{ backgroundColor: colors.black }}>
@@ -74,13 +78,15 @@ const Wallet = () => {
 
           {/* todo: wallet list */}
           {loading && <Loading />}
-          <FlatList 
-          data={wallets} 
-          renderItem={({item, index}) => {
-            return <WalletListItem item={item} index={index} router={router}/>
-          }}
-          contentContainerStyle={styles.listStyle}
-        />
+          <FlatList
+            data={wallets}
+            renderItem={({ item, index }) => {
+              return (
+                <WalletListItem item={item} index={index} router={router} />
+              );
+            }}
+            contentContainerStyle={styles.listStyle}
+          />
         </View>
       </View>
     </ScreenWrapper>

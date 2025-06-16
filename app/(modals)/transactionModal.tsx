@@ -26,6 +26,9 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 import ImageUpload from "@/components/imageUpload";
 //import { createOrUpdatetransaction, deletetransaction } from "@/services/transactionService";
+import { Dropdown } from "react-native-element-dropdown";
+import { transactionTypes } from "@/constants/data";
+import { deleteWallet } from "@/services/walletService";
 
 const TransactionModal = () => {
   const { user, updateUserData } = useAuth();
@@ -89,7 +92,7 @@ const TransactionModal = () => {
       return;
     }
     setIsLoading(true);
-    const res = await deletetransaction(oldTransaction?.id);
+    const res = await deleteWallet(oldTransaction?.id);
     setIsLoading(false);
     if (res.success) {
       router.back();
@@ -127,15 +130,31 @@ const TransactionModal = () => {
         />
 
         {/* form */}
-        <ScrollView contentContainerStyle={styles.form}>
+        <ScrollView
+          contentContainerStyle={styles.form}
+          showsVerticalScrollIndicator={false}
+        >
           <View style={styles.inputContainer}>
-            <Typo color={colors.neutral200}>transaction Name</Typo>
-            <Input
-              placeholder="Salary"
-              value={transaction.name}
-              onChangeText={(value) =>
-                settransaction({ ...transaction, name: value })
-              }
+            <Typo color={colors.neutral200}>Type</Typo>
+            {/* Dropdown for transaction type */}
+            <Dropdown
+              style={styles.dropdwownContainer}
+              activeColor={colors.neutral700}
+              placeholderStyle={styles.dropDownPlaceholder}
+              selectedTextStyle={styles.dropdownselectedtext}
+              iconStyle={styles.dropdownIcon}
+              data={transactionTypes}
+              maxHeight={300}
+              labelField="label"
+              valueField="value"
+              value={transaction.type}
+              itemTextStyle={styles.dropdownitemtext}
+              itemContainerStyle={styles.dropDownitemcontainer}
+              containerStyle={styles.dropdownlistcontainer}
+              //placeholder={!isFocus ? "Select type" : "..."}
+              onChange={(item) => {
+                settransaction({ ...transaction, type: item.value });
+              }}
             />
           </View>
           <View style={styles.inputContainer}>
@@ -266,6 +285,10 @@ const styles = StyleSheet.create({
     color: colors.white,
   },
 
+  dropdownitemtext: {
+    color: colors.white,
+  },
+
   dropDownitemcontainer: {
     borderRadius: radius._15,
     marginHorizontal: spacingX._7,
@@ -274,5 +297,9 @@ const styles = StyleSheet.create({
   dropdownIcon: {
     height: verticalScale(30),
     tintColor: colors.neutral300,
+  },
+
+  inputContainer: {
+    gap: spacingY._10,
   },
 });
