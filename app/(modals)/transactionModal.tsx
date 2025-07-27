@@ -1,5 +1,7 @@
 import {
   Alert,
+  Platform,
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -27,10 +29,13 @@ import * as ImagePicker from "expo-image-picker";
 import ImageUpload from "@/components/imageUpload";
 //import { createOrUpdatetransaction, deletetransaction } from "@/services/transactionService";
 import { Dropdown } from "react-native-element-dropdown";
-import { transactionTypes } from "@/constants/data";
+import { expenseCategories, transactionTypes } from "@/constants/data";
 import { deleteWallet } from "@/services/walletService";
 import useFetchdata from "@/hooks/useFetchdata";
 import { orderBy, where } from "firebase/firestore";
+import DateTimePicker, {
+  DateTimePickerEvent,
+} from "@react-native-community/datetimepicker";
 
 const TransactionModal = () => {
   const { user } = useAuth();
@@ -45,6 +50,7 @@ const TransactionModal = () => {
   });
 
   const [isLoading, setIsLoading] = useState(false);
+  const [showdatePicker, setShowDatePicker] = useState(false);
   const router = useRouter();
 
   const {
@@ -59,6 +65,12 @@ const TransactionModal = () => {
   const oldTransaction: { name: string; image: string; id: string } =
     useLocalSearchParams();
   console.log("oldTransaction", oldTransaction);
+
+  const onDatechange = (event: any, selectedDate: any) => {
+    const currentDate = selectedDate || transaction.date;
+    settransaction({ ...transaction, date: currentDate });
+    setShowDatePicker(Platform.OS === "ios" ? true : false);
+  };
 
   // useEffect(() => {
   //   if (oldTransaction?.id) {
@@ -146,7 +158,9 @@ const TransactionModal = () => {
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.inputContainer}>
-            <Typo color={colors.neutral200}>Type</Typo>
+            <Typo color={colors.neutral200} size={16}>
+              Type
+            </Typo>
             {/* Dropdown for transaction type */}
             <Dropdown
               style={styles.dropdwownContainer}
@@ -154,10 +168,7 @@ const TransactionModal = () => {
               placeholderStyle={styles.dropDownPlaceholder}
               selectedTextStyle={styles.dropdownselectedtext}
               iconStyle={styles.dropdownIcon}
-              data={wallets.map((wallet) => ({
-                label: `₹{wallet?.name} (₹₹{wallet?.amount})`,
-                value: wallet?.id,
-              }))}
+              data={transactionTypes}
               maxHeight={300}
               labelField="label"
               valueField="value"
@@ -172,8 +183,10 @@ const TransactionModal = () => {
             />
           </View>
           <View style={styles.inputContainer}>
-            <Typo color={colors.neutral200}>Wallet</Typo>
-            {/* Dropdown for transaction type */}
+            <Typo color={colors.neutral200} size={16}>
+              Wallet
+            </Typo>
+            {/* Dropdown for wallets */}
             <Dropdown
               style={styles.dropdwownContainer}
               activeColor={colors.neutral700}
@@ -181,22 +194,125 @@ const TransactionModal = () => {
               selectedTextStyle={styles.dropdownselectedtext}
               iconStyle={styles.dropdownIcon}
               data={wallets.map((wallet) => ({
-                label: `₹{wallet?.name} (₹₹{wallet?.amount})`,
+                label: `${wallet?.name} (₹${wallet.amount})`,
                 value: wallet?.id,
               }))}
               maxHeight={300}
               labelField="label"
               valueField="value"
-              value={transaction.type}
+              value={transaction.walletId}
               itemTextStyle={styles.dropdownitemtext}
               itemContainerStyle={styles.dropDownitemcontainer}
               containerStyle={styles.dropdownlistcontainer}
-              //placeholder={!isFocus ? "Select type" : "..."}
+              placeholder={"Select wallet"}
               onChange={(item) => {
-                settransaction({ ...transaction, type: item.value });
+                settransaction({ ...transaction, walletId: item.value || "" });
               }}
             />
           </View>
+
+          {/* Expense categories */}
+          {transaction.type === "expense" && (
+            <View style={styles.inputContainer}>
+              <Typo color={colors.neutral200} size={16}>
+                Expense Category
+              </Typo>
+              {/* Dropdown for wallets */}
+              <Dropdown
+                style={styles.dropdwownContainer}
+                activeColor={colors.neutral700}
+                placeholderStyle={styles.dropDownPlaceholder}
+                selectedTextStyle={styles.dropdownselectedtext}
+                iconStyle={styles.dropdownIcon}
+                data={Object.values(expenseCategories)}
+                maxHeight={300}
+                labelField="label"
+                valueField="value"
+                value={transaction.category}
+                itemTextStyle={styles.dropdownitemtext}
+                itemContainerStyle={styles.dropDownitemcontainer}
+                containerStyle={styles.dropdownlistcontainer}
+                placeholder={"Select Category"}
+                onChange={(item) => {
+                  settransaction({
+                    ...transaction,
+                    category: item.value || "",
+                  });
+                }}
+              />
+            </View>
+          )}
+
+          {/* Date picker */}
+          <View style={styles.inputContainer}>
+            <Typo color={colors.neutral200} size={16}>
+              Date
+            </Typo>
+            {!showdatePicker && (
+              <Pressable
+                style={styles.dateInput}
+                onPress={() => setShowDatePicker(true)}
+              >
+                <Typo size={14}>
+                  {(transaction.date as Date).toLocaleDateString()}
+                </Typo>
+              </Pressable>
+            )}
+
+            {showdatePicker && (
+              <View style={Platform.OS === "ios" && styles.iosDatePicker}>
+                <DateTimePicker
+                  value={transaction.date as Date}
+                  mode="date"
+                  display={Platform.OS == "ios" ? "spinner" : "default"}
+                  onChange={onDatechange}
+                  themeVariant="dark"
+                  textColor={colors.white}
+                />
+              </View>
+            )}
+          </View>
+
+          {/* Amount input */}
+          <View style={styles.inputContainer}>
+            <Typo color={colors.neutral200} size={16}>
+              Amount
+            </Typo>
+            <Input
+              keyboardType="numeric"
+              value={transaction.amount?.toString()}
+              onChangeText={(value) =>
+                settransaction({
+                  ...transaction,
+                  amount: Number(value.replace(/[^0-9]/g, "")),
+                })
+              }
+            />
+          </View>
+
+          {/* Description of transaction */}
+          <View style={styles.inputContainer}>
+            <View style={styles.flexRow}>
+              <Typo color={colors.neutral200} size={16}>
+                Description
+              </Typo>
+              <Typo color={colors.neutral500} size={14}>
+                (optional)
+              </Typo>
+            </View>
+
+            <Input
+              keyboardType="numeric"
+              value={transaction.amount?.toString()}
+              onChangeText={(value) =>
+                settransaction({
+                  ...transaction,
+                  amount: Number(value.replace(/[^0-9]/g, "")),
+                })
+              }
+            />
+          </View>
+
           <View style={styles.inputContainer}>
             <Typo color={colors.neutral200}>transaction Icon</Typo>
             <ImageUpload
@@ -261,6 +377,10 @@ const styles = StyleSheet.create({
     borderTopColor: colors.neutral700,
     marginBottom: spacingY._5,
     borderTopWidth: 1,
+  },
+
+  iosDatePicker: {
+    backgroundColor: "red",
   },
 
   flexRow: {
