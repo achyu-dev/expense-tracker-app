@@ -18,7 +18,7 @@ import { getProfileImage } from "@/services/imageService";
 import * as Icons from "phosphor-react-native";
 import Typo from "@/components/Typo";
 import Input from "@/components/Input";
-import { TransactionType, UserDataType } from "@/types";
+import { TransactionType, UserDataType, WalletType } from "@/types";
 import Button from "@/components/Button";
 import { useAuth } from "@/contexts/authContext";
 import { updateUser } from "@/services/userService";
@@ -29,9 +29,11 @@ import ImageUpload from "@/components/imageUpload";
 import { Dropdown } from "react-native-element-dropdown";
 import { transactionTypes } from "@/constants/data";
 import { deleteWallet } from "@/services/walletService";
+import useFetchdata from "@/hooks/useFetchdata";
+import { orderBy, where } from "firebase/firestore";
 
 const TransactionModal = () => {
-  const { user, updateUserData } = useAuth();
+  const { user } = useAuth();
   const [transaction, settransaction] = useState<TransactionType>({
     type: "expense",
     amount: 0,
@@ -44,6 +46,15 @@ const TransactionModal = () => {
 
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+
+  const {
+    data: wallets,
+    error: walletError,
+    loading: walletLoading,
+  } = useFetchdata<WalletType>("wallets", [
+    where("uid", "==", user?.uid),
+    orderBy("created", "desc"),
+  ]);
 
   const oldTransaction: { name: string; image: string; id: string } =
     useLocalSearchParams();
@@ -143,7 +154,36 @@ const TransactionModal = () => {
               placeholderStyle={styles.dropDownPlaceholder}
               selectedTextStyle={styles.dropdownselectedtext}
               iconStyle={styles.dropdownIcon}
-              data={transactionTypes}
+              data={wallets.map((wallet) => ({
+                label: `₹{wallet?.name} (₹₹{wallet?.amount})`,
+                value: wallet?.id,
+              }))}
+              maxHeight={300}
+              labelField="label"
+              valueField="value"
+              value={transaction.type}
+              itemTextStyle={styles.dropdownitemtext}
+              itemContainerStyle={styles.dropDownitemcontainer}
+              containerStyle={styles.dropdownlistcontainer}
+              //placeholder={!isFocus ? "Select type" : "..."}
+              onChange={(item) => {
+                settransaction({ ...transaction, type: item.value });
+              }}
+            />
+          </View>
+          <View style={styles.inputContainer}>
+            <Typo color={colors.neutral200}>Wallet</Typo>
+            {/* Dropdown for transaction type */}
+            <Dropdown
+              style={styles.dropdwownContainer}
+              activeColor={colors.neutral700}
+              placeholderStyle={styles.dropDownPlaceholder}
+              selectedTextStyle={styles.dropdownselectedtext}
+              iconStyle={styles.dropdownIcon}
+              data={wallets.map((wallet) => ({
+                label: `₹{wallet?.name} (₹₹{wallet?.amount})`,
+                value: wallet?.id,
+              }))}
               maxHeight={300}
               labelField="label"
               valueField="value"
