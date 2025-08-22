@@ -64,7 +64,7 @@ const TransactionModal = () => {
 
   const oldTransaction: { name: string; image: string; id: string } =
     useLocalSearchParams();
-  console.log("oldTransaction", oldTransaction);
+  //console.log("oldTransaction", oldTransaction);
 
   const onDatechange = (event: any, selectedDate: any) => {
     const currentDate = selectedDate || transaction.date;
@@ -109,7 +109,7 @@ const TransactionModal = () => {
   };
 
   const onDelete = async () => {
-    console.log("Delete transaction pressed", oldTransaction?.id);
+    //console.log("Delete transaction pressed", oldTransaction?.id);
     if (!oldTransaction?.id) {
       //Alert.alert("Error", "No transaction to delete");
       return;
@@ -303,7 +303,8 @@ const TransactionModal = () => {
 
             <Input
               keyboardType="numeric"
-              value={transaction.amount?.toString()}
+              value={transaction.description}
+              //4:43:59
               onChangeText={(value) =>
                 settransaction({
                   ...transaction,
