@@ -36,6 +36,7 @@ import { orderBy, where } from "firebase/firestore";
 import DateTimePicker, {
   DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
+import { createOrUpdatetransaction } from "@/services/transactionService";
 
 const TransactionModal = () => {
   const { user } = useAuth();
@@ -82,30 +83,38 @@ const TransactionModal = () => {
   // }, []);
 
   const onSubmit = async () => {
-    // let { name, image } = transaction;
-    // if (!name.trim() || !image) {
-    //   Alert.alert("transaction", "Please fill all the fields");
-    //   return;
-    // }
-    // const data: transactionType = {
-    //   name,
-    //   image,
-    //   uid: user?.uid,
-    // };
-    // //include transaction if updating
-    // if (oldTransaction?.id) {
-    //   data.id = oldTransaction?.id;
-    // }
-    // setIsLoading(true);
-    // const res = await createOrUpdatetransaction(data);
-    // setIsLoading(false);
-    // console.log("result", res);
-    // if (res.success) {
-    //   //updateUserData(user?.uid as string);
-    //   router.back();
-    // } else {
-    //   Alert.alert("transaction", res.msg);
-    // }
+    const { type, amount, description, category, date, walletId, image } =
+      transaction;
+
+    if (!walletId || !date || !amount || (type == "expense" && !category)) {
+      Alert.alert("Error", "Please fill all required fields");
+      return;
+    }
+
+    console.log("Good to go", transaction);
+    let transactionData: TransactionType = {
+      type,
+      amount,
+      description,
+      category,
+      date,
+      walletId,
+      image,
+      uid: user?.uid,
+    };
+
+    console.log("Transaction data: ", transactionData);
+
+    // todo: include id for updating existing transaction
+    setIsLoading(true);
+    const res = await createOrUpdatetransaction(transactionData);
+    setIsLoading(false);
+    if (res.success) {
+      router.back();
+    } else {
+      Alert.alert("Transaction", res.msg);
+    }
+
   };
 
   const onDelete = async () => {
@@ -305,17 +314,31 @@ const TransactionModal = () => {
               keyboardType="numeric"
               value={transaction.description}
               //4:43:59
+              multiline
+              containerStyle={{
+                flexDirection: "row",
+                height: verticalScale(100),
+                paddingVertical: 15,
+                alignItems: "flex-start",
+              }}
               onChangeText={(value) =>
                 settransaction({
                   ...transaction,
-                  amount: Number(value.replace(/[^0-9]/g, "")),
+                  description: value,
                 })
               }
             />
           </View>
 
           <View style={styles.inputContainer}>
-            <Typo color={colors.neutral200}>transaction Icon</Typo>
+            <View style={styles.flexRow}>
+              <Typo color={colors.neutral200} size={16}>
+                Receipt
+              </Typo>
+              <Typo color={colors.neutral500} size={14}>
+                (optional)
+              </Typo>
+            </View>
             <ImageUpload
               file={transaction.image}
               onSelect={(file) =>
@@ -346,7 +369,7 @@ const TransactionModal = () => {
         )}
         <Button onPress={onSubmit} style={{ flex: 1 }} loading={isLoading}>
           <Typo color={colors.black} fontWeight={"700"}>
-            {oldTransaction?.id ? "Update transaction" : "Add transaction"}
+            {oldTransaction?.id ? "Update" : "Submit"}
           </Typo>
         </Button>
       </View>

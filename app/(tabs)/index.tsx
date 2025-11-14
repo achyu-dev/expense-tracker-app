@@ -22,6 +22,8 @@ import { router, useRouter } from "expo-router";
 const Home = () => {
   const { user } = useAuth();
   const router = useRouter();
+
+  // 5:13:43 
   return (
     <ScreenWrapper>
       <View style={styles.container}>
