@@ -7,7 +7,8 @@ import { colors, radius, spacingX, spacingY } from "@/constants/theme";
 import Typo from "./Typo";
 import { FlashList } from "@shopify/flash-list";
 import Loading from "./Loading";
-import { expenseCategories } from "@/constants/data";
+import { expenseCategories, incomeCategory } from "@/constants/data";
+import { Timestamp } from "firebase/firestore";
 
 const TransactionList = ({
   data,
@@ -15,6 +16,8 @@ const TransactionList = ({
   loading,
   emptyListMessage,
 }: TransactionListType) => {
+
+  //5:21:39
   const handleClick = () => {
     // Handle the click event for the transaction item
   };
@@ -64,7 +67,9 @@ const TransactionItem = ({
   index,
   handleClick,
 }: TransactionItemProps) => {
-  let category = expenseCategories[item.category || "entertainment"];
+  console.log("item", item?.description);
+  let category =
+    item?.type == "income" ? incomeCategory : expenseCategories[item.category!];
   console.log("category", category);
 
   if (!category) {
@@ -77,6 +82,12 @@ const TransactionItem = ({
   }
 
   const IconComponent = category?.icon;
+
+  const date = (item?.date as Timestamp)?.toDate().toLocaleDateString("en-IN", {
+    day: "numeric",
+    month: "short",
+  }
+  )
   return (
     <Animated.View
       entering={FadeInDown.delay(index * 100)
@@ -106,11 +117,14 @@ const TransactionItem = ({
         </View>
 
         <View style={styles.amountDate}>
-          <Typo color={colors.rose} fontWeight={"500"}>
-            - ₹23
+          <Typo
+            color={item?.type == "income" ? colors.primary : colors.rose}
+            fontWeight={"500"}
+          >
+            {`${item?.type == "income" ? "+ ₹" : "- ₹"}${item?.amount}`}
           </Typo>
           <Typo size={13} color={colors.neutral400}>
-            12 July 2025
+            {date}
           </Typo>
         </View>
       </TouchableOpacity>
